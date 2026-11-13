@@ -52,6 +52,30 @@ namespace camp
 namespace experimental
 {
 
+#if CUDART_VERSION >= 13000
+template<>
+struct StreamInsertHelper<cudaMemLocation const&>
+{
+  cudaMemLocation const& m_val;
+
+  std::ostream& operator()(std::ostream& str) const
+  {
+    return str << "{type=" << m_val.type << ",id=" << m_val.id << "}";
+  }
+};
+
+template<>
+struct StreamInsertHelper<cudaMemLocation&>
+{
+  cudaMemLocation& m_val;
+
+  std::ostream& operator()(std::ostream& str) const
+  {
+    return StreamInsertHelper<cudaMemLocation const&>{m_val}(str);
+  }
+};
+#endif
+
 template<>
 struct StreamInsertHelper<RAJA_CUDA_DIM_T&>
 {
